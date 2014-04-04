@@ -1,0 +1,62 @@
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="/stylesheets/chat.css">
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			//establish websocket connection
+			io = io.connect();
+
+			io.on('new_user', function(data){
+				console.log(data)
+				$('#window').append("<p>" + data.name + " has joined our chat, baby yeah! </p>");
+				$('#users ul').append("<li>" + data.name +"</li>");
+			})
+
+			$('#send').click(function(){
+				var text = $('#text').val();
+				io.emit('message', {message: text});
+				$('#text').val('');
+			})
+
+			io.on('chat', function(data){
+				$('#window').append("<p class='"+data.user_data.color+"'>" + data.user_data.name +  " said: " + data.new_message + "</p>");
+			})
+
+			$('a').click(function(){
+				io.emit('log_off', {message: 'user wants to log off'});
+			})
+
+			$('#color').change(function(){
+				var color = $('#color').val();
+				io.emit('color_change', {new_color: color})
+			})
+		})
+	</script>
+</head>
+<body>
+	<a href="/logout">sign off baby yeah!</a>
+	<h1>Look at all of the beautiful people chatting here baby YEAH!</h1>
+	<h2>You look dashing! <%= session_stuff.name %></h2>
+	<div id='window'>
+	</div>
+	<div id='users'>
+		<h3>List of users!</h3>
+		<ul>
+		</ul>
+	</div>
+	<h2>Say something randy baby yeah!</h2>
+	<textarea id='text'></textarea>
+	<button id='send'>Chat!</button>
+	<h3>Pick another colour baby yeah!</h3>
+	<select id='color'>
+	    	<option selected>black</option>
+	    	<option >red</option>
+	    	<option >yellow</option>
+	    	<option >purple</option>
+	    	<option >blue</option>
+	</select>
+</body>
+</html>
